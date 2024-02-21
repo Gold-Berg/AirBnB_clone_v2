@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import unittest
 import sys
 import os
@@ -79,6 +80,10 @@ class TestConsole(unittest.TestCase):
         self.assertEqual(res.total_errors, 0,
                          "Found code style errors (and warnings).")
 
+    def test_doc_constructor(self):
+        """Constructor documentation"""
+        doc = TestConsole.__init__.__doc__
+        self.assertGreater(len(doc), 1)
 
 if __name__ == "__main__":
     unittest.main()
