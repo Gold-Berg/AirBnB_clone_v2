@@ -113,35 +113,29 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, arg):
-        """Creates a new instance of BaseModel, saves it
-        Exceptions:
-            SyntaxError: when there is no args given
-            NameError: when there is no object taht has the name
-        """
+    def do_create(self, args):
+        """ Create an object of any class"""
         try:
-            if not arg:
+            if not args:
                 raise SyntaxError()
-            my_list = arg.split(" ")
-            obj = eval("{}()".format(my_list[0]))
-            print("{}".format(obj.id))
-            for num in range(1, len(my_list)):
-                my_list[num] = my_list[num].replace('=', ' ')
-                attributes = split(my_list[num])
-                attributes[1] = attributes[1].replace('_', ' ')
+            split1 = args.split(' ')
+            new_list = eval('{}()'.format(split1[0]))
+            params = split1[1:]
+            for param in params:
+                k, v = param.split('=')
                 try:
-                    var = eval(attributes[1])
-                    attributes[1] = var
+                    attribute = HBNBCommand.verify_attribute(v)
                 except:
-                    pass
-                if type(attributes[1]) is not tuple:
-                    setattr(obj, attributes[0], attributes[1])
-            obj.save()
+                    continue
+                if not attribute:
+                    continue
+                setattr(new_list, k, attribute)
+            new_list.save()
+            print(new_list.id)
         except SyntaxError:
             print("** class name missing **")
-        except NameError:
+        except NameError as e:
             print("** class doesn't exist **")
-
 
     def help_create(self):
         """ Help information for the create method """
