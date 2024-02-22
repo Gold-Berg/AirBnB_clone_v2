@@ -115,27 +115,37 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, args):
         """ Create an object of any class"""
-        try:
-            if not args:
-                raise SyntaxError()
-            split1 = args.split(' ')
-            new_instance = eval('{}()'.format(split1[0]))
-            params = split1[1:]
-            for param in params:
-                k, v = param.split('=')
-                try:
-                    attribute = HBNBCommand.verify_attribute(v)
-                except:
-                    continue
-                if not attribute:
-                    continue
-                setattr(new_instance, k, attribute)
-            new_instance.save()
-            print(new_instance.id)
-        except SyntaxError:
+        if not args:
             print("** class name missing **")
-        except NameError as e:
+            return
+
+        class_name, *params = args.split()
+
+        if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
+            return
+
+        obj = HBNBCommand.classes[class_name]()
+
+        for param in params:
+            ttry:
+                key, value = param.split('=')
+                key = key.replace('_', ' ')
+                value = value.replace('\\"', '"')
+                if value.startswith('"') and value.endswith('"'):
+                    value = value[1:-1]
+                    value = value.replace('\\', '')
+                    if '.' in value:
+                        setattr(obj, key, float(value))
+                    else:
+                         setattr(obj, key, int(value) if value.isdigit() else value)
+                else:
+                     setattr(obj, key, int(value) if value.isdigit() else value)
+            except ValueError:
+                print("** invalid parameter format: {} **".format(param))
+
+        obj.save()
+        print(obj.id)
 
     def help_create(self):
         """ Help information for the create method """
