@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import models#!/usr/bin/python3
 import models
 from models.base_model import BaseModel, Base
 from models.state import State
@@ -19,20 +20,15 @@ class DBStorage:
     __session = None
 
     def __init__(self):
-        user = getenv('HBNB_MYSQL_USER')
-        pwd = getenv('HBNB_MYSQL_PWD')
-        host = getenv('HBNB_MYSQL_HOST')
-        db = getenv('HBNB_MYSQL_DB')
-        env = getenv('HBNB_ENV')
-
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
-                                      .format(user, pwd, host, db),
+        self.__engine = create_engine("mysql+mysqldb://{}:{}@{}/{}".format(
+            getenv("HBNB_MYSQL_USER"), getenv("HBNB_MYSQL_PWD"),
+            getenv("HBNB_MYSQL_HOST"), getenv("HBNB_MYSQL_DB")),
                                       pool_pre_ping=True)
-        if env == 'test':
-            Base.metadata.drop_all(self.__engine)
 
-        Session = scoped_session(sessionmaker(bind=self.__engine,
-                                               expire_on_commit=False))
+        if getenv("HBNB_ENV") == "test":
+            Base.metadata.drop_all(self.__engine)
+        Base.metadata.create_all(self.__engine)
+        Session = sessionmaker(bind=self.__engine)
         self.__session = Session()
 
     def all(self, cls=None):
