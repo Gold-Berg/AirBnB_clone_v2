@@ -1,4 +1,5 @@
-
+#!/usr/bin/python3
+import models
 from models.base_model import BaseModel, Base
 from models.state import State
 from models.city import City
