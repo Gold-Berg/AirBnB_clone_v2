@@ -1,5 +1,4 @@
-#!/usr/bin/python3
-import models
+
 from models.base_model import BaseModel, Base
 from models.state import State
 from models.city import City
@@ -65,3 +64,7 @@ class DBStorage:
         Session = scoped_session(sessionmaker(bind=self.__engine,
                                                expire_on_commit=False))
         self.__session = Session()
+
+    def close(self):
+        """ Call remove() method """
+        self.__session.close()
