@@ -32,34 +32,39 @@ class DBStorage:
         self.__session = Session()
 
     def all(self, cls=None):
-        from models import base_model
-        objs = {}
-        if cls:
-            query = self.__session.query(cls).all()
+        """ Shows all instances of the given class or all all classes"""
+        allClasses = ["State", "City", "User", "Place", "Review", "Amenity"]
+        listClasses = []
+        dictClasses = {}
+        if cls is not None and cls in allClasses:
+            listClasses = self.__session.query(eval(cls)).all()
         else:
-            classes = [base_model.Base.__subclasses__()]
-            query = []
-            for c in classes:
-                query += self.__session.query(c).all()
-        for obj in query:
-            key = "{}.{}".format(type(obj).__name__, obj.id)
-            objs[key] = obj
-        return objs
+            for cls in allClasses:
+                listClasses += self.__session.query(eval(cls)).all()
+        for classObject in listClasses:
+            key = classObject.__class__.__name__ + "." + classObject.id
+            dictClasses[key] = classObject
+        return dictClasses
 
     def new(self, obj):
-        self.__session.add(obj)
+        """ add obj to the current database session """
+        if obj:
+            self.__session.add(obj)
 
     def save(self):
+        """ commit all changes of the current database session """
         self.__session.commit()
 
     def delete(self, obj=None):
+        """ deletes obj to the current database session """
         if obj:
             self.__session.delete(obj)
 
     def reload(self):
+        """ create all tables in the database """
         Base.metadata.create_all(self.__engine)
         Session = scoped_session(sessionmaker(bind=self.__engine,
-                                               expire_on_commit=False))
+                                              expire_on_commit=False))
         self.__session = Session()
 
     def close(self):
